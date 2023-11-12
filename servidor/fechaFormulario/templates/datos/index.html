@@ -1,0 +1,5 @@
+<form method="post" action="{% url 'my_view' %}">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Enviar</button>
+</form>
