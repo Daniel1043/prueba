@@ -14,7 +14,6 @@ class MyForm(forms.Form):
         cleaned_data=super().clean()
         nombre  =cleaned_data.get("nombre")
         contraseña=cleaned_data.get("contraseña")
-        fecha_acceso=cleaned_data.get("fecha_acceso")
         special_characters = "!@#$%^&*()-_=+[]|;:'\",.<>/?"
 
         if nombre==contraseña:
@@ -38,15 +37,25 @@ class MyForm(forms.Form):
         if not any(char.isupper() for char in contraseña):
             raise ValidationError("La contraseña debe contener al menos una letra mayúscula.")
         
+      
+        
+        return cleaned_data
+    
+    def clean_fecha_acceso(self):
+        fecha_acceso = self.cleaned_data["fecha_acceso"]
+        
         if fecha_acceso:
             ahora = datetime.now()
             diferencia_tiempo = ahora - fecha_acceso
 
-            if diferencia_tiempo.total_seconds() > 120:  # 120 segundos = 2 minutos
+            if diferencia_tiempo> 120:  # 120 segundos = 2 minutos
                 # Reiniciar los datos y cambiar la fecha oculta
                
-                cleaned_data['fecha_acceso'] = ahora
-                cleaned_data['contraseña'] = ''
-                cleaned_data['usuario'] = ''
-        
-        return cleaned_data
+                self.cleaned_data['fecha_acceso'] = ahora
+                self.cleaned_data['contraseña'] = ''
+                self.cleaned_data['usuario'] = ''
+
+        # Always return a value to use as the new cleaned data, even if
+        # this method didn't change it.
+        return fecha_acceso
+
